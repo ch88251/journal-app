@@ -1,0 +1,36 @@
+version: '3.9'
+services:
+  postgres-db:
+    image: postgres:13.3
+    restart: always
+    environment:
+      POSTGRES_USER: journal
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: journal
+    ports:
+      - 5432:5432
+    volumes:
+      - ./postgres-data:/var/lib/postgresql/data
+  keycloak:
+    image: jboss/keycloak:15.0.2
+    command: 
+      [
+        "-b", "0.0.0.0",
+        "-Dkeycloak.profile.feature.upload_scripts=enabled",
+        "-Dkeycloak.migration.action=import",
+        "-Dkeycloak.migration.provider=dir",
+        "-Dkeycloak.migration.dir=/opt/jboss/keycloak/realms",
+        "-Dkeycloak.migration.strategy=OVERWRITE_EXISTING",
+        "-Djboss.socket.binding.port-offset=1000"
+      ]
+volumes:
+  - ./realms:/opt/jboss/keycloak/realms
+environment:
+  KEYCLOAK_USER: ${KEYCLOAK_USER}
+  KEYCLOAK_PASSWORD: ${KEYCLOAK_PASSWORD}
+  KEYCLOAK_IMPORT: /opt/jboss/keycloak/realms/journal-realm.json
+  DB_VENDOR: POSTGRES
+  DB_ADDR: postgres-db
+  DB_DATABASE: journal
+  DB_USER: journal
+  DB_PASSWORD: ${POSTGRES_PASSWORD}
