@@ -23,14 +23,18 @@ services:
         "-Dkeycloak.migration.strategy=OVERWRITE_EXISTING",
         "-Djboss.socket.binding.port-offset=1000"
       ]
-volumes:
-  - ./realms:/opt/jboss/keycloak/realms
-environment:
-  KEYCLOAK_USER: ${KEYCLOAK_USER}
-  KEYCLOAK_PASSWORD: ${KEYCLOAK_PASSWORD}
-  KEYCLOAK_IMPORT: /opt/jboss/keycloak/realms/journal-realm.json
-  DB_VENDOR: POSTGRES
-  DB_ADDR: postgres-db
-  DB_DATABASE: journal
-  DB_USER: journal
-  DB_PASSWORD: ${POSTGRES_PASSWORD}
+    volumes:
+      - ./realms:/opt/jboss/keycloak/realms
+    environment:
+      KEYCLOAK_USER: ${KEYCLOAK_USER}
+      KEYCLOAK_PASSWORD: ${KEYCLOAK_PASSWORD}
+      KEYCLOAK_IMPORT: /opt/jboss/keycloak/realms/journal-realm.json
+      DB_VENDOR: POSTGRES
+      DB_ADDR: postgres-db
+      DB_DATABASE: journal
+      DB_USER: journal
+      DB_PASSWORD: ${POSTGRES_PASSWORD}
+    ports:
+      - 9080:9080
+    depends_on:
+      - postgres-db
